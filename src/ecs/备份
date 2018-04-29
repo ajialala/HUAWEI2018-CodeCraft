@@ -1,0 +1,55 @@
+	sorted_normaliz_2 = []
+	for value in sorted_normaliz:
+		for item in value:
+			sorted_normaliz_2.append(item)
+	sorted_normaliz_2.reverse()
+	sorted_normaliz_3 = []
+	for value in sorted_normaliz:
+		value.reverse()
+		for item in value:
+			sorted_normaliz_3.append(item)
+	print sorted_normaliz_2
+	print sorted_normaliz_3
+
+
+def update(data):
+	ori_data = [a for a in data]
+	data = arma_math.fil(data)
+	data = [a ** (1./2) for a in data]
+	firsr_order = 7
+	second_order = 1
+	temp1 = data[0:firsr_order]
+	data = diff.diff(firsr_order,data)
+	data = diff.diff(second_order,data[firsr_order:])
+	meandata = arma_math.mean_value(data)
+	data = arma.decent(meandata,data)
+	var = arma_math.var(data)
+	data = [a / var for a in data]
+	phi = arma.AR(data[second_order:])
+	
+	newdata = [a for a in data[:len(phi)]]
+	for i in range(len(data)-len(phi)):
+		j = -1
+		tem_sum = 0
+		for value in phi:
+			tem_sum += value[0] * data[len(phi)+i+j]
+			j -= 1
+		newdata.append(tem_sum)
+
+	data = [a * var for a in newdata]
+	data = arma.cent(meandata,data)
+	data = diff.rediff(second_order,data)
+	data = diff.rediff(firsr_order,temp1+data)
+	for i in range(len(data)):
+		if data[i] < 0:
+			data[i] = 0
+	data = [a ** 2 for a in data]
+	var = arma_math.var(ori_data)
+	mean = arma_math.mean_value(data)
+	for i in range(len(data)):
+		thr = 15 * mean
+		if abs(data[i]-ori_data[i]) > thr:
+			#ori_data[i] = data[i] + 0.5 * (ori_data[i] - data[i])
+			ori_data[i] = data[i]
+	
+	return ori_data

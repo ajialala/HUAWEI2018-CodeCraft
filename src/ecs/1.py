@@ -1,0 +1,2 @@
+from RFpredictor import*
+pre()
